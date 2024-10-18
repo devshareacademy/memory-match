@@ -1,6 +1,6 @@
-# memory-match
+# Memory Match
 
-A NPM package that contains the core game logic for the game Memory Match
+A NPM package that contains the core game logic for the game Memory Match.
 
 ## Installation
 
@@ -17,76 +17,90 @@ yarn add -E @devshareacademy/memory-match
 ```typescript
 import { MemoryMatch } from '@devshareacademy/memory-match';
 
-const memoryMatch = new MemoryMatch();
+// Example array of card pairs (2 sets of matching cards)
+const cards = [1, 2, 3, 1, 2, 3];
+const game = new MemoryMatch({
+        cards,
+        onCardFlipCallback: (cardIndex) => { console.log(`Card flipped: ${cardIndex}`); },
+        onMatchCallback: (firstIndex, secondIndex) => { console.log(`Match found: ${firstIndex}, ${secondIndex}`); },
+        onMismatchCallback: (firstIndex, secondIndex) => { console.log(`Mismatch: ${firstIndex}, ${secondIndex}`); },
+        onGameOverCallback: () => { console.log('Game Over! All cards matched!'); }
+    }
+);
 
-// first player adds their checker to the 1st column
-connectFour.makeMove(0);
+// Simulate flipping cards
+game.flipCard(0);
+game.flipCard(3); // Match
 ```
 
 For more details on the library and the available methods, please see the documentation and examples below.
 
 ## API Documentation
 
-The game of Connect Four is represented by a 1D Array that has 42 spaces. This 1D Array represents a 2D Array that is made up of 7 columns and 6 rows. Each cell in the Array will have one of the following values:
+The game of Memory Match is represented by a 1D Array that matches the number of "Card" objects that are passed to the game configuration. To play the game, the player flips over cards one at a time looking to find a match. When a match is found, the card can no longer be flipped back over, and the game continues until all matches have been found. The library is constructed in a way that the core logic for the game is contained in the `MemoryMatch` class, and you can pass callback functions that will be invoked when key events happen in the game:
 
-* `0` - Represents an empty space
-* `1` - Represents the space is occupied by the first player
-* `2` - Represents the space is occupied by the second player
+- a card is flipped over
+- when a match is made
+- when two cards do not match
+- when the game is over
 
-At this time, the constructor of the `ConnectFour` class does not take any configuration options.
+This structure should allow the library to work with any JavaScript framework, library, or even plain JavaScript games. The callbacks allow you to listen for these events, and then update the Game UI to reflect that state/action.
+
+The `MemoryMatch` class expects one argument, which is the game configuration object.
+
+### Game Config
+
+| Name | Type | Description |
+|---|---|---|
+| cards | any[] | An array of strings, numbers, or objects that represent the cards in the game. This is required argument. |
+| onCardFlipCallback | (cardIndex: number) => void | (Optional) A callback function that will be called when a card is flipped over. The callback will receive one argument: `cardIndex`, which is the index of the card that was flipped over. |
+| onMatchCallback | (firstIndex: number, secondIndex: number) => void | (Optional) A callback function that will be called after two cards have been flipped over and they do match. The callback will receive two arguments: `firstIndex` and `secondIndex`, which are the indexes of the two cards that were previously flipped over.. |
+| onMismatchCallback | (firstIndex: number, secondIndex: number) => void | (Optional) A callback function that will be called after two cards have been flipped over and they do not match. The callback will receive two arguments: `firstIndex` and `secondIndex`, which are the indexes of the two cards that were previously flipped over. |
+| onGameOverCallback | () => void | (Optional) A callback function that will be called when the game is over (all matches have been found). No arguments will be provided. |
+| howToCheckForMatch | (firstCard: T, secondCard: T) => boolean | (Optional) A callback function that will be used for checking if two "Cards" match. This allows the client to provide a custom `match` function. If not provided, the game will use a simple check of `firstCard === secondCard`. The callback will receive two arguments: `firstCard` and `secondCard`, which are the cards from the `cards` array that is provided in the game configuration. |
+| howToShuffle | (cards: T[]) => void | (Optional) A callback function that will be called when the game is doing an in place shuffle of the provided `cards` array. This allows the client to provide a custom shuffle algorithm. If not provided, the game will use an in place Fisher Yates shuffle algorithm. The callback will receive one argument: `cards`, which is the `cards` array that was provided in the game configuration. |
 
 ### Methods
 
-#### .makeMove(column)
+#### .flipCard(cardIndex)
 
-Allows the current player to drop a checker into one of the columns in the game board. This method will return the coordinate of where the checker was placed on the game board. This method will throw an error in the following scenarios:
-
-* A column index that is not within boundary of the game board, example `20`
-* The column is already full
-* The game is over
+Allows the player to flip over the card that is positioned at the provided index. This method will not return anything.
 
 ##### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| column | number | The index of the column the player game piece should be added to. Valid values are `0 - 6` |
-
-##### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| coordinate | object | The coordinate of where the checker was placed. Each object has two properties, `col` and `row` which are numbers representing the indexes of the cell row and column. Example: `[{"row":0,"col":0}]`. |
+| cardIndex | number | The index of the card that the player wants to flip over.
 
 #### .resetGame()
 
-Allows the player to reset the game, and start a brand new game. Once this method is called, it will be the first players turn again.
+Allows the player to reset the game, and start a brand new game.
 
 ### Properties
 
 | Property | Description | Type |
 |---|---|---|
-| board | A 1D array that represents the current board state. | number[] |
-| playersTurn | A string that represents the current players turn. Possible values are: `ONE` and `TWO`. | string |
-| isGameOver | A boolean flag that represents if the current game instance is finished. The game is considered finished when a player has won the game by getting a Connect Four, or when the game ends in a `DRAW` if no more spaces are left on the board. | boolean |
-| gameWinner | A string that represents the player that one the game. Possible values are `ONE` and `TWO`. If the game is not over, or if the game ends in a `DRAW`, then this property will return `undefined`. | string \| undefined |
-| winningCells | An array of objects that represent the coordinates of the winning cells that make up the winning combination. Each object has two properties, `col` and `row` which are numbers representing the indexes of the cell row and column. Example: `[{"row":0,"col":0}]`. If the game is not over, or if the game ends in a `DRAW`, then this property will return an empty array. | {   col: number;   row: number; }[] |
-| moveHistory | An array of moves that have been made in the existing game so far to create the current game board state. | number[] |
+| cards | A 1D array of the cards in the current game. | any[] |
+| flippedCards | An array of the current card indexes that are flipped over for the current match check. This will be reset after two cards have been checked. | number[] |
+| matchedCards | A `Set` of the card indexes that have been matched in the current game. | Set<number> |
+| isGameOver | A boolean flag that represents if the current game instance is finished. The game is considered finished when a player has matched all of the cards in the game. | boolean |
 
 ## Examples
 
 ### Simple Game
 
 ```typescript
-import { MemoryMatch } from '@devshareacademy/memory match';
+import { MemoryMatch } from '@devshareacademy/memory-match';
 
 // Example array of card pairs (2 sets of matching cards)
 const cards = [1, 2, 3, 1, 2, 3];
-const game = new MemoryMatch(
-    cards,
-    (cardIndex) => { console.log(`Card flipped: ${cardIndex}`); },
-    (firstIndex, secondIndex) => { console.log(`Match found: ${firstIndex}, ${secondIndex}`); },
-    (firstIndex, secondIndex) => { console.log(`Mismatch: ${firstIndex}, ${secondIndex}`); },
-    () => { console.log('Game Over! All cards matched!'); }
+const game = new MemoryMatch({
+        cards,
+        onCardFlipCallback: (cardIndex) => { console.log(`Card flipped: ${cardIndex}`); },
+        onMatchCallback: (firstIndex, secondIndex) => { console.log(`Match found: ${firstIndex}, ${secondIndex}`); },
+        onMismatchCallback: (firstIndex, secondIndex) => { console.log(`Mismatch: ${firstIndex}, ${secondIndex}`); },
+        onGameOverCallback: () => { console.log('Game Over! All cards matched!'); }
+    }
 );
 
 // Simulate flipping cards
