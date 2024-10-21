@@ -1,0 +1,53 @@
+{
+	"name": "@devshareacademy/memory-match",
+	"version": "0.0.1",
+	"description": "A NPM package that contains the core game logic for the game Connect Four.",
+	"files": [
+		"dist"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc -p ./config/tsconfig.build.json",
+		"test": "uvu -r ts-node/register tests",
+		"lint": "eslint \"./src\" \"./tests\" --ext .ts,.tsx --config ./config/.eslintrc",
+		"publish:npm": "npm publish --registry https://registry.npmjs.org/ --access public --ignore-scripts",
+		"publish:github": "npm publish --registry https://npm.pkg.github.com/ --ignore-scripts"
+	},
+	"author": "scottwestover",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/devshareacademy/memory-match.git"
+	},
+	"homepage": "https://github.com/devshareacademy/memory-match",
+	"devDependencies": {
+		"@devshareacademy/eslint-config": "0.0.16",
+		"@devshareacademy/prettier-config": "0.0.4",
+		"@devshareacademy/tsconfig": "0.0.3",
+		"@types/seedrandom": "3.0.8",
+		"@typescript-eslint/eslint-plugin": "5.22.0",
+		"@typescript-eslint/parser": "5.22.0",
+		"eslint": "8.14.0",
+		"eslint-config-prettier": "8.5.0",
+		"eslint-plugin-prettier": "4.0.0",
+		"prettier": "2.6.2",
+		"seedrandom": "3.0.5",
+		"ts-node": "10.9.1",
+		"typescript": "4.6.4",
+		"uvu": "0.5.6"
+	},
+	"dependencies": {},
+	"resolutions": {},
+	"prettier": "@devshareacademy/prettier-config",
+	"volta": {
+		"node": "20.12.2",
+		"yarn": "1.22.11",
+		"pnpm": "9.0.6"
+	},
+	"engines": {
+		"node": ">=16",
+		"yarn": ">=1.22.0",
+		"npm": ">=8"
+	}
+}
